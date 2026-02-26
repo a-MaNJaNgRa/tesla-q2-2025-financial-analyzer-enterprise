@@ -1,47 +1,45 @@
+mkdir -p app/agents
+cat > app/agents/agents.py << 'EOF'
+from dotenv import load_dotenv
 from crewai import Agent
 from langchain_openai import ChatOpenAI
-from app.core.config import get_settings
 
-settings = get_settings()
+load_dotenv()
 
-llm = ChatOpenAI(
-    api_key=settings.OPENAI_API_KEY,
-    model="gpt-4o-mini",
-    temperature=0.2,
-)
-
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.1)
 
 financial_analyst = Agent(
-    role="Senior Financial Analyst",
-    goal="Analyze financial documents and extract meaningful insights",
-    backstory=(
-        "You are an experienced Wall Street financial analyst "
-        "with deep expertise in quarterly earnings reports."
-    ),
+    role="Senior Tesla Financial Analyst",
+    goal="Analyze the provided Tesla Q2 2025 document text and give accurate insights.",
+    backstory="You are a top-tier Tesla analyst. Use only the provided document text.",
     llm=llm,
     verbose=True,
+    max_iter=12,
+    allow_delegation=True
 )
 
 verifier = Agent(
-    role="Financial Data Verifier",
-    goal="Verify correctness of extracted financial information",
-    backstory="You double-check financial statements for accuracy and consistency.",
+    role="Financial Document Verifier",
+    goal="Confirm the document is Tesla's official Q2 2025 Update.",
+    backstory="You verify corporate financial filings.",
     llm=llm,
     verbose=True,
+    max_iter=4
 )
 
 investment_advisor = Agent(
-    role="Investment Advisor",
-    goal="Provide strategic investment insights",
-    backstory="You provide professional investment-grade insights based on financial data.",
+    role="Institutional Investment Advisor",
+    goal="Give a clear Buy/Hold/Sell recommendation for TSLA.",
+    backstory="You manage a large Tesla-focused fund.",
     llm=llm,
-    verbose=True,
+    verbose=True
 )
 
 risk_assessor = Agent(
-    role="Risk Analyst",
-    goal="Identify risks and red flags in financial reports",
-    backstory="You specialize in detecting financial, operational, and macroeconomic risks.",
+    role="Risk Assessment Expert",
+    goal="Identify all material risks from the Q2 2025 document.",
+    backstory="Former SEC filing examiner.",
     llm=llm,
-    verbose=True,
+    verbose=True
 )
+EOF
