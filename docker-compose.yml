@@ -1,8 +1,9 @@
-version: "3.9"
+cat > docker-compose.yml << 'EOF'
+version: '3.9'
 
 services:
   postgres:
-    image: postgres:16
+    image: postgres:16-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -14,16 +15,19 @@ services:
 
   redis:
     image: redis:7-alpine
+    ports:
+      - "6379:6379"
 
   app:
     build: .
     ports:
       - "8000:8000"
-    env_file:
-      - .env
+    env_file: .env
     depends_on:
       - postgres
       - redis
+    restart: unless-stopped
 
 volumes:
   postgres_data:
+EOF
